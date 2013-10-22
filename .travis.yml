@@ -1,0 +1,17 @@
+language: php
+
+php:
+    - 5.3
+    - 5.4
+
+env:
+    - CAKE_VERSION=master
+
+before_script:
+    - git clone --depth 1 --branch $CAKE_VERSION git://github.com/cakephp/cakephp ../cakephp && cd ../cakephp
+    - mv ../CakePHP-Bootstrap-Menu app/Plugin/BootstrapMenu
+    - chmod -R 777 app/tmp
+    - chmod -R 777 app/webroot
+
+script:
+    - ./lib/Cake/Console/cake test BootstrapMenu --stderr
