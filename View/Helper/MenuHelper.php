@@ -9,142 +9,218 @@
  */
 App::uses('AppHelper', 'View/Helper');
 class MenuHelper extends AppHelper {
-/** Helper dependencies
- *
- * @var array
- * @access public
- */
-    public $helpers = array('Html');
+    /** Helper dependencies
+     *
+     * @var array
+     * @access public
+     */
+        public $helpers = array('Html');
 
-/**
- * Array of global menu
- *
- * @var array
- * @access protected
- */
-    protected $_menu = array();
+    /**
+     * Array of global menu
+     *
+     * @var array
+     * @access protected
+     */
+        protected $_menu = array();
 
-/**
- * Current user group
- *
- * @var String
- * @access protected
- */
-    protected $_group = null;
-
-/**
- * Current depth of menu
- *
- * @var Integer
- * @access protected
- */
-    protected $_depth = 0;
-
-
-
-/**
- * Constructor.
- *
- * @access public
- */
-    public function __construct(View $View) {
-        parent::__construct($View);
+    /**
+     * Constructor.
+     *
+     * @access public
+     */
+        public function __construct(View $View) {
+            parent::__construct($View);
     }
 
-/**
- * Returns the whole menu HTML.
- *
- * @param string optional Array key.
- * @param array optional Aditional Options.
- * @param array optional Data which has the key.
- * @return string HTML menu
- * @access public
- */
-    public function build(Array $menus = null) {
-?>
-<div class="navbar navbar-default navbar-static-top">
-  <div class="navbar-inner">
-      <button type="button" class="btn btn-navbar" data-toggle="collapse" data-target="#nav-collapse"></button>
-        <?php
-            if (isset($menus['brand'])){
-               echo $this->_buildBrand($menus['brand']);
+    /**
+     * Returns the whole menu HTML.
+     *
+     * @param string optional Array key.
+     * @param array optional Aditional Options.
+     * @param array optional Data which has the key.
+     * @return string HTML menu
+     * @access public
+     */
+        public function build(Array $menus = null) {
+            $html='';
+
+            $html.='<nav class="navbar navbar-default" role="navigation">';
+            $html.=   $this->_buildHeader($menus["brand"]);
+            $html.=   $this->_buildCollapse($menus["nav"]);
+            $html.='</nav>';
+            return html_entity_decode($html);
+        }
+
+    /**
+     * Returns the whole menu HTML.
+     *
+     * @param string optional Array key.
+     * @param array optional Aditional Options.
+     * @param array optional Data which has the key.
+     * @return string HTML menu
+     * @access public
+     */
+        public function _buildHeader(Array $brand) {
+            $html='';
+            $html.='<div class="navbar-header">';
+            $html.='   <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">';
+            $html.='   <span class="sr-only">Toggle navigation</span>';
+            $html.='   <span class="icon-bar"></span>';
+            $html.='    <span class="icon-bar"></span>';
+            $html.='    <span class="icon-bar"></span>';
+            $html.='    </button>';
+            $html.=    $this->_buildBrand($brand);
+            $html.='</div>';
+            return $html;
+        }
+
+    /**
+     * Returns a menu Brand HTML.
+     *
+     * @param array Array of brand parameter
+     * @return string HTML menu item
+     * @access public
+     */
+        public function _buildBrand($brand) {
+            extract($brand);
+            if (!isset($link)) {
+                $link="#";
             }
-        ?>
-      <div class="nav-collapse collapse" id="nav-collapse">
-        <ul class="nav">
-         <?php
-           /* foreach ($menus as $menu) {
+            if (!isset($label)) {
+                $label="";
+            }
+            if (!isset($class)) {
+                $class="";
+            }
+            return $this->Html->link($label,$link,array("class"=>'navbar-brand $class'));
 
-                foreach($menu as $key =>$value){
+        }
 
-                    if($key=="label"){
-                        $label = $value;
-                    }
-                    if($key=="link"){
-                        $link = $value;
-                    }
-                    if(!isset($link)){
-                        $link = array();
-                    }
-                    if($key=="submenu"){
-                        $submenu = $value;
-                    }
-                }
-            echo "<li>";
-            echo $this->Html->link($label,$link,array('escape'=>false,
-                    'class'=>'$class'
-                ));
+    /**
+     * Returns a menu Brand HTML.
+     *
+     * @param array Array of brand parameter
+     * @return string HTML menu item
+     * @access public
+     */
+        public function _buildCollapse($data) {
+            $html='';
+            $side=null;
+            $html.='<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">';
+            if(isset($data["side"])&&!empty($data["side"])){
+                $side=' navbar-'.$data["side"];
+            }
+            $html.=$this->_buildNav($data["content"],$side);
+            $html.='</div>';
+            return $html;
 
-            echo "</li>";
+        }
+
+    /**
+     * Returns a menu Brand HTML.
+     *
+     * @param array Array of brand parameter
+     * @return string HTML menu item
+     * @access public
+     */
+        public function _buildNav($data,$side) {
+            $html='';
+
+            $html.="<ul class='nav navbar-nav $side'>";
+            foreach ($data as $value) {
+                $html.=     $this->_buildLi($value);
+            }
+            $html.='</ul>';
+            return $html;
+        }
+
+    /**
+     * Returns a menu Brand HTML.
+     *
+     * @param array Array of brand parameter
+     * @return string HTML menu item
+     * @access public
+     */
+        public function _buildLi($data){
+            $html='';
+            $options=null;
+            $active=null;
+            extract($data);
+            if (!isset($link)) {
+                $link="#";
+            }
+            if (!isset($label)) {
+                $label="";
+            }
+            if (isset($class)) {
+               $option["class"] ="";
+            }
+
+            if (isset($submenu)) {
+
+                $html.="<li class='dropdown'>";
+                $html.=     $this->_buildLink($label,$link,true);
+                $html.=     $this->_buildDropDownMenu($submenu);
+                $html.='</li>';
+            }else{
+                $html.="<li $active>";
+                $html.=     $this->_buildLink($label,$link);
+                $html.='</li>';
+            }
+            return $html;
+        }
+
+    /**
+     * Returns a menu Brand HTML.
+     *
+     * @param array Array of brand parameter
+     * @return string HTML menu item
+     * @access public
+     */
+        public function _buildDropDownMenu($data){
+           // debug($data);
+            $html='';
+            $options=null;
+            $active=null;
+            $html.='<ul class="dropdown-menu">';
+            foreach ($data as $value) {
+                $html.=     $this->_buildLi($value);
+            }
+            $html.='</ul>';
+            return $html;
+        }
+    /**
+     * Returns a menu Brand HTML.
+     *
+     * @param array Array of brand parameter
+     * @return string HTML menu item
+     * @access public
+     */
+        public function _buildLink($label,$link,$dropdown=false){
+            $active=null;
+            $options=null;
+            $html='';
+            if (!isset($link)) {
+                $link="#";
+            }
+            if (!isset($label)) {
+                $label="";
+            }
+            if (isset($class)) {
+               $option["class"] ="";
+            }
+            if($dropdown){
+                $options["class"] ="dropdown-toggle";
+                $options["data-toggle"] ="dropdown";
+                $label.=' <b class="caret"></b>';
+            }
+           /* if($this->Request->controller == $link){
+                $active = "active";
             }*/
-           ?>
-        </ul>
-      </div>
-  </div>
-</div>
- <?php   }
 
-/**
- * Returns a menu item HTML.
- *
- * @param array Array of menu item
- * @param int optional Position of the item.
- * @return string HTML menu item
- * @access protected
- */
-    protected function _buildItem(&$item, $pos = -1, &$isActive = false) {
-
-    }
-/**
- * Returns a menu Brand HTML.
- *
- * @param array Array of brand parameter
- * @return string HTML menu item
- * @access public
- */
-    public function _buildBrand($brand) {
-        extract($brand);
-        if (!isset($link)) {
-            $link="#";
+            $html.=     $this->Html->link($label,$link,$options);
+            return $html;
         }
-        if (!isset($label)) {
-            $label="";
-        }
-        if (!isset($class)) {
-            $class="";
-        }
-        return"<a href='$link' class='navbar-brand $class'>$label</a>";
-    }
-
- /**
- * Returns a menu Brand HTML.
- *
- * @param array Array of brand parameter
- * @return string HTML menu item
- * @access protected
- */
-    protected function _buildMenu() {
-        return"<a href='$link' class='navbar-brand $class'>$label</a>";
-    }
-
 }
+ ?>
