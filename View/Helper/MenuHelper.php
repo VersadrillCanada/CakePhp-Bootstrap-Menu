@@ -108,10 +108,12 @@ class MenuHelper extends AppHelper {
             $html='';
             $side=null;
             $html.='<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">';
-            if(isset($data["side"])&&!empty($data["side"])){
-                $side=' navbar-'.$data["side"];
+            foreach ($data as $value) {;
+                if(isset($value["side"])&&!empty($value["side"])){
+                    $side=' navbar-'.$value["side"];
+                }
+                $html.=$this->_buildNav($value["content"],$side);
             }
-            $html.=$this->_buildNav($data["content"],$side);
             $html.='</div>';
             return $html;
 
