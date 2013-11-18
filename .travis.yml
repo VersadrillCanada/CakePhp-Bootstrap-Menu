@@ -8,7 +8,6 @@ env:
     - CAKE_VERSION=master
 
 before_script:
-    - /home/travis/.phpenv/versions/5.3.26/bin/composer.phar self-update
     - git clone --depth 1 --branch $CAKE_VERSION git://github.com/cakephp/cakephp ../cakephp && cd ../cakephp
     - mv ../CakePhp-Bootstrap-Menu app/Plugin/BootstrapMenu
     - chmod -R 777 app/tmp
