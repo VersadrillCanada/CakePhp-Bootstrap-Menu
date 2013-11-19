@@ -220,7 +220,9 @@ class MenuHelper extends AppHelper {
            /* if($this->Request->controller == $link){
                 $active = "active";
             }*/
-
+            if($link!="#"){
+                //$label.=" ".$this->requestAction(array('plugin'=>'BootstrapMenu','controller'=>'permissions','action'=>'check',$link["controller"],$link["action"]));
+            }
             $html.=     $this->Html->link($label,$link,$options);
             return $html;
         }
