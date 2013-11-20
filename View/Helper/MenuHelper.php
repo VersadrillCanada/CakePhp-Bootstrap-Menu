@@ -165,11 +165,14 @@ class MenuHelper extends AppHelper {
                 $html.=     $this->_buildLink($label,$link,true);
                 $html.=     $this->_buildDropDownMenu($submenu);
                 $html.='</li>';
+            }elseif(isset($divider)){
+                $html.="<li class='divider'>ffew</li>";
             }else{
                 $html.="<li $active>";
                 $html.=     $this->_buildLink($label,$link);
                 $html.='</li>';
             }
+
             return $html;
         }
 
